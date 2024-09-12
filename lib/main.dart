@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gemini_ai/core/constant.dart';
 import 'package:flutter_gemini_ai/home_screen.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 
 void main() {
   // final model =

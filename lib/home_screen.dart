@@ -19,16 +19,17 @@ class _HomePageState extends State<HomePage> {
   //CREATE AN ARRAY TO SAVE THE ANSWER PROVIDED BY GEMINI
   List geminiAnswers = [];
 
-  Future<String?> sendMessage({String? msg}) async {
+  Future<String?> sendMessage({required String msg}) async {
     final model =
         GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
-    // const prompt = 'Write a story about a magic backpack.';
-    final prompt = '$msg';
-    final content = [Content.text(prompt)];
+    final content = [Content.text(msg)];
     final response = await model.generateContent(content);
-
-    debugPrint('gemini ans: ${response.text}');
-    geminiAnswers.add(response.text);
+    if (response.text != null) {
+      setState(() {
+        geminiAnswers.add(response.text);
+      });
+    }
+    debugPrint('$geminiAnswers');
     return response.text;
   }
 
@@ -47,21 +48,20 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            // Expanded(child: Text(answer!)),
             Expanded(
-              child: FutureBuilder(
-                future: sendMessage(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasData) {
-                    return Text('$geminiAnswers');
-                  }
-                  return const Text('data');
+              child: ListView.builder(
+                itemCount: geminiAnswers.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Container(
+                        decoration: const BoxDecoration(color: Colors.blue),
+                        child: Text(geminiAnswers[index])),
+                  );
                 },
               ),
             ),
+            //
             Row(
               children: [
                 Expanded(
@@ -72,11 +72,12 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(10))),
                   ),
                 ),
+                //
                 IconButton(
-                    onPressed: () {
-                      setState(() {
-                        sendMessage(msg: _sendMessageController.text.trim());
-                      });
+                    onPressed: () async {
+                      await sendMessage(
+                          msg: _sendMessageController.text.trim());
+                      _sendMessageController.clear();
                     },
                     icon: const Icon(Icons.send)),
               ],
