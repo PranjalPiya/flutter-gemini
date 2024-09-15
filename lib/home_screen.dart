@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -72,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: appBarColor,
         centerTitle: true,
         title: const Text(
-          'Gemini AI in flutter app',
+          'Gemini AI',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -114,10 +112,14 @@ class _HomePageState extends State<HomePage> {
                     style: const TextStyle(color: textColor),
                     controller: _sendMessageController,
                     decoration: InputDecoration(
-                        hintText: 'Enter a prompt here',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10))),
+                      hintText: 'Enter a prompt here',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: headingColor),
+                          borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
                 ),
                 const SizedBox(
@@ -136,15 +138,19 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.green, shape: BoxShape.circle),
                         child: IconButton(
                             onPressed: () async {
-                              _scrollDown();
-                              geminiAnswers.add({
-                                'generatedMsg': '',
-                                'isUser': true,
-                                'userMsg': _sendMessageController.text.trim(),
-                              });
-                              await sendMessage(
-                                  msg: _sendMessageController.text.trim());
-                              _sendMessageController.clear();
+                              if (_sendMessageController.text.isEmpty) {
+                                showErrorSnackBar();
+                              } else {
+                                _scrollDown();
+                                geminiAnswers.add({
+                                  'generatedMsg': '',
+                                  'isUser': true,
+                                  'userMsg': _sendMessageController.text.trim(),
+                                });
+                                await sendMessage(
+                                    msg: _sendMessageController.text.trim());
+                                _sendMessageController.clear();
+                              }
                             },
                             icon: Icon(
                               Icons.send,
