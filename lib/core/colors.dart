@@ -9,8 +9,3 @@ const headingColor = Colors.white;
 
 final iconColor = Colors.grey.shade100;
 const textColor = Colors.white;
-
-
-  // primary: Colors.grey.shade600,
-  // secondary: Colors.grey.shade700,
-  // inversePrimary: Colors.grey.shade300,

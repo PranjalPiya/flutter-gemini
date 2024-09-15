@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gemini_ai/home_screen.dart';
 
 void main() {
-  // final model =
-  //     GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
-
   runApp(const MyApp());
 }
 
