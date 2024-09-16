@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -65,39 +67,40 @@ class _HomePageState extends State<HomePage> {
     return response.text;
   }
 
+  double confidenceLevel = 0;
+  // void listenForPermissions() async {
+  //   final status = await Permission.microphone.status;
+  //   switch (status) {
+  //     case PermissionStatus.denied:
+  //       requestForPermission();
+  //       break;
+  //     case PermissionStatus.granted:
+  //       break;
+  //     case PermissionStatus.limited:
+  //       break;
+  //     case PermissionStatus.permanentlyDenied:
+  //       break;
+  //     case PermissionStatus.restricted:
+  //       break;
+  //     case PermissionStatus.provisional:
+  //     // TODO: Handle this case.
+  //   }
+  // }
+
+  // Future<void> requestForPermission() async {
+  //   await Permission.microphone.request();
+  // }
+
   final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
-  String _wordsSpoken = "";
-  double confidenceLevel = 0;
-  void listenForPermissions() async {
-    final status = await Permission.microphone.status;
-    switch (status) {
-      case PermissionStatus.denied:
-        requestForPermission();
-        break;
-      case PermissionStatus.granted:
-        break;
-      case PermissionStatus.limited:
-        break;
-      case PermissionStatus.permanentlyDenied:
-        break;
-      case PermissionStatus.restricted:
-        break;
-      case PermissionStatus.provisional:
-      // TODO: Handle this case.
-    }
-  }
-
-  Future<void> requestForPermission() async {
-    await Permission.microphone.request();
-  }
-
+  String _wordsSpoken = '';
   @override
   void initState() {
     super.initState();
-    listenForPermissions();
+    // listenForPermissions();
 
     _initSpeech();
+    // _captureVoice();
   }
 
   /// This has to happen only once per app
@@ -111,20 +114,25 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       confidenceLevel = 0;
     });
+    log('trigger');
   }
 
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {});
+    log('stop listen');
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
-      _wordsSpoken = "${result.recognizedWords} ";
+      _wordsSpoken = result.recognizedWords;
       confidenceLevel = result.confidence;
       _sendMessageController.text = _wordsSpoken;
     });
+    log('words spoken $_wordsSpoken');
   }
+
+  //
 
   @override
   Widget build(BuildContext context) {
@@ -210,9 +218,9 @@ class _HomePageState extends State<HomePage> {
                   decoration: const BoxDecoration(
                       color: Colors.blue, shape: BoxShape.circle),
                   child: IconButton(
-                      onPressed: _speechToText.isNotListening
-                          ? _startListening
-                          : _stopListening,
+                      onPressed: _speechToText.isListening
+                          ? _stopListening
+                          : _startListening,
                       icon: Icon(
                         _speechToText.isNotListening
                             ? Icons.mic_off
