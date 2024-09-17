@@ -190,6 +190,32 @@ class _HomePageState extends State<HomePage> {
             //
             Row(
               children: [
+                //
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: const BoxDecoration(
+                      color: Colors.blue, shape: BoxShape.circle),
+                  child: IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return const Column(
+                              children: [Text('hehe')],
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        Icons.add,
+                        color: iconColor,
+                      )),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                //
                 Expanded(
                   child: TextFormField(
                     onTapOutside: (event) => FocusScope.of(context).unfocus(),
