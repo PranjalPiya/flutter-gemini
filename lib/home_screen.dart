@@ -1,15 +1,14 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_gemini_ai/core/colors.dart';
 import 'package:flutter_gemini_ai/core/constant.dart';
+import 'package:flutter_gemini_ai/core/custom/custom_initial_containers.dart';
 import 'package:flutter_gemini_ai/core/custom/custom_text_bubble.dart';
+import 'package:flutter_gemini_ai/core/error.dart';
+import 'package:flutter_gemini_ai/core/static_list.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -23,10 +22,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _sendMessageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  String? answer = '';
+  // String? answer = '';
   //CREATE AN ARRAY TO SAVE THE ANSWER PROVIDED BY GEMINI
   List<Map<String, dynamic>> geminiAnswers = [];
   bool isLoading = false;
+  double confidenceLevel = 0;
+  final SpeechToText _speechToText = SpeechToText();
+  bool speechEnabled = false;
+  String _wordsSpoken = '';
+
   //for auto scroll
   void _scrollDown() {
     WidgetsBinding.instance.addPostFrameCallback(
@@ -67,45 +71,15 @@ class _HomePageState extends State<HomePage> {
     return response.text;
   }
 
-  double confidenceLevel = 0;
-  // void listenForPermissions() async {
-  //   final status = await Permission.microphone.status;
-  //   switch (status) {
-  //     case PermissionStatus.denied:
-  //       requestForPermission();
-  //       break;
-  //     case PermissionStatus.granted:
-  //       break;
-  //     case PermissionStatus.limited:
-  //       break;
-  //     case PermissionStatus.permanentlyDenied:
-  //       break;
-  //     case PermissionStatus.restricted:
-  //       break;
-  //     case PermissionStatus.provisional:
-  //     // TODO: Handle this case.
-  //   }
-  // }
-
-  // Future<void> requestForPermission() async {
-  //   await Permission.microphone.request();
-  // }
-
-  final SpeechToText _speechToText = SpeechToText();
-  bool _speechEnabled = false;
-  String _wordsSpoken = '';
   @override
   void initState() {
     super.initState();
-    // listenForPermissions();
-
     _initSpeech();
-    // _captureVoice();
   }
 
   /// This has to happen only once per app
   void _initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
+    speechEnabled = await _speechToText.initialize();
     setState(() {});
   }
 
@@ -139,82 +113,81 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: appBarColor,
-        centerTitle: true,
-        title: const Text(
-          'Gemini AI',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+          backgroundColor: appBarColor,
+          centerTitle: true,
+          title: const Text(
+            'Gemini AI',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.replay_outlined,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  geminiAnswers.clear();
+                });
+              },
+            ),
+          ]),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
         child: Column(
           children: [
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3.0),
-                child:
-                    // Column(
-                    //   children: [
-                    //     Text(_speechToText.isListening
-                    //         ? 'Listening'
-                    //         : _speechEnabled
-                    //             ? 'Tap the mic to start listening'
-                    //             : 'Speech not available'),
-                    //     Text('hello:- $_wordsSpoken'),
-                    //     if (_speechToText.isNotListening && confidenceLevel > 0)
-                    //       Text(
-                    //           'confidence${(confidenceLevel * 100).toStringAsFixed(1)}%')
-                    //   ],
-                    // ),
-                    geminiAnswers.isEmpty
-                        ? initialContainer()
-                        : ListView.builder(
-                            // shrinkWrap: true,
-                            controller: _scrollController,
-                            itemCount: geminiAnswers.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: CustomTextBubble(
-                                  isUser: geminiAnswers[index]['isUser'],
-                                  generatedMsg:
-                                      '${geminiAnswers[index]['generatedMsg']}',
-                                  userMsg: '${geminiAnswers[index]['userMsg']}',
-                                ),
-                              );
-                            },
-                          ),
+                child: geminiAnswers.isEmpty
+                    ? initialContainer(
+                        sendMessageController: _sendMessageController)
+                    : ListView.builder(
+                        // shrinkWrap: true,
+                        controller: _scrollController,
+                        itemCount: geminiAnswers.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: CustomTextBubble(
+                              isUser: geminiAnswers[index]['isUser'],
+                              generatedMsg:
+                                  '${geminiAnswers[index]['generatedMsg']}',
+                              userMsg: '${geminiAnswers[index]['userMsg']}',
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
             //
             Row(
               children: [
                 //
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: const BoxDecoration(
-                      color: Colors.blue, shape: BoxShape.circle),
-                  child: IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return const Column(
-                              children: [Text('hehe')],
-                            );
-                          },
-                        );
-                      },
-                      icon: Icon(
-                        Icons.add,
-                        color: iconColor,
-                      )),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
+                // Container(
+                //   height: 40,
+                //   width: 40,
+                //   decoration: const BoxDecoration(
+                //       color: Colors.blue, shape: BoxShape.circle),
+                //   child: IconButton(
+                //       onPressed: () {
+                //         showModalBottomSheet(
+                //           context: context,
+                //           builder: (context) {
+                //             return const Column(
+                //               children: [Text('hehe')],
+                //             );
+                //           },
+                //         );
+                //       },
+                //       icon: Icon(
+                //         Icons.add,
+                //         color: iconColor,
+                //       )),
+                // ),
+                // const SizedBox(
+                //   width: 5,
+                // ),
                 //
                 Expanded(
                   child: TextFormField(
@@ -294,62 +267,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
-  }
-
-  void showErrorSnackBar() {
-    final snackBar = SnackBar(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-      content: const Text('Write some prompt before submitting!!'),
-    );
-
-// Find the ScaffoldMessenger in the widget tree
-// and use it to show a SnackBar.
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  List onLoadQuestionList = [
-    'Show me the best route from Chitwan to Kathmandu.',
-    'Give me 10 best novel of all time.',
-    'Can you provide me a roadmap to become a flutter developer.',
-  ];
-
-  Widget initialContainer() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(
-          'How can I help you?',
-          style: TextStyle(
-              fontSize: 25, fontWeight: FontWeight.w600, color: headingColor),
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(onLoadQuestionList.length, (index) {
-            return GestureDetector(
-              onTap: () {
-                _sendMessageController.text = '${onLoadQuestionList[index]}';
-              },
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                height: 110,
-                width: 120,
-                decoration: BoxDecoration(
-                    color: appBarColor,
-                    borderRadius: BorderRadius.circular(10)),
-                child: Text(
-                  '${onLoadQuestionList[index]}',
-                  style: const TextStyle(fontSize: 12, color: Colors.white),
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
     );
   }
 }
