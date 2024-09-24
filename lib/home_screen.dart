@@ -133,7 +133,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ]),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5),
         child: Column(
           children: [
             Expanded(
