@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_gemini_ai/core/custom/custom_button.dart';
 import 'package:flutter_gemini_ai/core/custom/custom_textformfield.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,7 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: Column(
           children: [
-            const Text('Enter your credentials'),
+            const Text(
+              'Enter your credentials',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             CustomTextFormField(
               controller: _emailController,
               hintText: 'Enter your email',
@@ -49,6 +57,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 return null;
               },
               // focusNode: ,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            CustomButton(
+              title: 'Login',
+              onPressed: () {},
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            CustomButton(
+              title: 'SignIn with google',
+              onPressed: () {},
             ),
           ],
         ),
