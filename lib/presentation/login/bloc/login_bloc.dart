@@ -21,6 +21,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emitter.call(
             const LoginFailureState(errorMsg: 'Error while google sign-in'));
       }
-    } catch (e) {}
+    } catch (e) {
+      emitter.call(LoginFailureState(errorMsg: '$e'));
+    }
   }
 }
