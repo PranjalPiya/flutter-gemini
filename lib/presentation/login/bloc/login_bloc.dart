@@ -13,16 +13,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   void signInWithGoogleEvent(
       SignInWithGoogleEvent event, Emitter<LoginState> emitter) async {
+    emitter.call(GoogleSignInLoadingState());
     try {
       final isSignIn = await authServices.signInWithGoogle();
       if (isSignIn) {
-        emitter.call(const LoginSuccessState(successMsg: 'LoggedIn'));
+        emitter.call(const GoogleSignInSuccessState(successMsg: 'LoggedIn'));
       } else {
-        emitter.call(
-            const LoginFailureState(errorMsg: 'Error while google sign-in'));
+        emitter.call(const GoogleSignInFailedState(
+            errorMsg: 'Error while google sign-in'));
       }
     } catch (e) {
-      emitter.call(LoginFailureState(errorMsg: '$e'));
+      emitter.call(GoogleSignInFailedState(errorMsg: '$e'));
     }
   }
 }

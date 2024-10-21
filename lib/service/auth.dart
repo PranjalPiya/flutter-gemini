@@ -37,4 +37,12 @@ class AuthServices {
       return false;
     }
   }
+
+  Future<bool> signOutWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signOut();
+    if (googleUser == null) {
+      return true;
+    }
+    return false;
+  }
 }

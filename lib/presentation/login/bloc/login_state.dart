@@ -22,3 +22,19 @@ final class LoginFailureState extends LoginState {
 
   const LoginFailureState({required this.errorMsg});
 }
+
+final class GoogleSignInLoadingState extends LoginState {}
+
+final class GoogleSignInSuccessState extends LoginState {
+  final String? successMsg;
+  final dynamic successResponse;
+
+  const GoogleSignInSuccessState(
+      {required this.successMsg, this.successResponse});
+}
+
+final class GoogleSignInFailedState extends LoginState {
+  final String? errorMsg;
+
+  const GoogleSignInFailedState({required this.errorMsg});
+}
