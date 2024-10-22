@@ -26,4 +26,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emitter.call(GoogleSignInFailedState(errorMsg: '$e'));
     }
   }
+
+  void logout() async {
+    try {} catch (e) {}
+  }
 }

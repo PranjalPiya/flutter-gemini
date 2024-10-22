@@ -38,3 +38,17 @@ final class GoogleSignInFailedState extends LoginState {
 
   const GoogleSignInFailedState({required this.errorMsg});
 }
+
+final class LogoutLoadingState extends LoginState {}
+
+final class LogoutSuccessState extends LoginState {
+  final String? successMsg;
+
+  const LogoutSuccessState({required this.successMsg});
+}
+
+final class LogoutFailedState extends LoginState {
+  final String? errorMsg;
+
+  const LogoutFailedState({required this.errorMsg});
+}

@@ -10,3 +10,5 @@ sealed class LoginEvent extends Equatable {
 class LoginButtonPressedEvent extends LoginEvent {}
 
 class SignInWithGoogleEvent extends LoginEvent {}
+
+class LogoutButtonPressedEvent extends LoginEvent {}
