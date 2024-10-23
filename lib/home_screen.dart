@@ -1,12 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gemini_ai/core/colors.dart';
 import 'package:flutter_gemini_ai/core/constant.dart';
 import 'package:flutter_gemini_ai/core/custom/custom_initial_containers.dart';
 import 'package:flutter_gemini_ai/core/custom/custom_text_bubble.dart';
 import 'package:flutter_gemini_ai/core/error.dart';
 import 'package:flutter_gemini_ai/core/static_list.dart';
+import 'package:flutter_gemini_ai/presentation/login/bloc/login_bloc.dart';
+import 'package:flutter_gemini_ai/presentation/login/screens/login_screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -132,15 +135,7 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                await GoogleSignIn().signOut();
-              },
-            ),
+            const Logout(),
           ]),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5),
@@ -276,6 +271,40 @@ class _HomePageState extends State<HomePage> {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class Logout extends StatelessWidget {
+  const Logout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<LoginBloc, LoginState>(
+      listener: (context, state) {
+        if (state is LogoutSuccessState) {
+          log('${state.successMsg}');
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+        }
+        if (state is LogoutFailedState) {
+          log('${state.errorMsg}');
+        }
+      },
+      child: BlocBuilder<LoginBloc, LoginState>(
+        builder: (context, state) {
+          return IconButton(
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              context.read<LoginBloc>().add(LogoutButtonPressedEvent());
+              // await GoogleSignIn().signOut();
+            },
+          );
+        },
       ),
     );
   }

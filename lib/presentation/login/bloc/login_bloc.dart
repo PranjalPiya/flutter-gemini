@@ -9,6 +9,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthServices authServices;
   LoginBloc(this.authServices) : super(LoginInitial()) {
     on<SignInWithGoogleEvent>(signInWithGoogleEvent);
+    on<LogoutButtonPressedEvent>(logout);
   }
 
   void signInWithGoogleEvent(
@@ -27,7 +28,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  void logout() async {
-    try {} catch (e) {}
+  void logout(
+      LogoutButtonPressedEvent event, Emitter<LoginState> emitter) async {
+    try {
+      await authServices.signOutWithGoogle();
+      emitter.call(const LogoutSuccessState(successMsg: 'Logout successfully'));
+    } catch (e) {
+      emitter
+          .call(const LogoutFailedState(errorMsg: 'Error while logging out!'));
+    }
   }
 }

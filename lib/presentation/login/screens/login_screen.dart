@@ -29,7 +29,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is GoogleSignInLoadingState) {
